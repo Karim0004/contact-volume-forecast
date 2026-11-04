@@ -11,3 +11,12 @@
 5. A couple of small data issues: one row has complaint_type "Safety" next to the usual SAFETY, and 3 rows have borough "Unspecified".
 
 Still to decide: forecast all channels or phone only. Point 4 matters for that, since a phone-only series has a level shift in Dec 2025.
+
+## Aggregate, 4 Nov 2026
+
+`interval_counts()` and `daily_counts()` in src/data.py build two tables, saved as data/interval.parquet (52,560 half-hours) and data/daily.parquet (1,095 days, 1 Nov 2023 to 30 Oct 2026). Both have total, phone, online and mobile counts, so the all-channels or phone-only question can still go either way. The daily table also has weekday, month, a US federal holiday flag from the holidays package (35 dates in the range), the hours lost to feed gaps and an outage flag.
+
+1. The feed has more gaps than the five missing days. A run of 2 hours or more with no requests is treated as a gap, since even at 3 to 4am there are about 10 requests per half-hour on average. Besides the 5 missing days, that finds 155.5 hours of gaps spread over 29 days.
+2. Gaps are left empty instead of 0. The plan was to fill missing days with zeros, but every real day in this data has requests (the quietest has 473), so a 0 would only ever stand for an outage.
+3. Daily totals on those 29 days are too low, and some are among the quietest days in the data (16 Mar 2025 has 601 requests with 8.5 hours missing). Others come back with a backlog after the gap, like 15 Apr 2024 (7,398) and 18 Jan 2024 (6,054). The EDA outlier step needs to decide whether these count as missing days or get a flag in the models.
+4. 518 empty half-hours in shorter runs are left as 0, and 92% of them are between midnight and 6am, so they look like real quiet spells.
