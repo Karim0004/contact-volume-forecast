@@ -20,3 +20,18 @@ Still to decide: forecast all channels or phone only. Point 4 matters for that, 
 2. Gaps are left empty instead of 0. The plan was to fill missing days with zeros, but every real day in this data has requests (the quietest has 473), so a 0 would only ever stand for an outage.
 3. Daily totals on those 29 days are too low, and some are among the quietest days in the data (16 Mar 2025 has 601 requests with 8.5 hours missing). Others come back with a backlog after the gap, like 15 Apr 2024 (7,398) and 18 Jan 2024 (6,054). The EDA outlier step needs to decide whether these count as missing days or get a flag in the models.
 4. 518 empty half-hours in shorter runs are left as 0, and 92% of them are between midnight and 6am, so they look like real quiet spells.
+
+## EDA, 6 Nov 2026
+
+The charts are in notebooks/03_eda.ipynb and reports/figures.
+
+1. Seasonality is the biggest pattern. January averages 3,019 to 4,188 requests a day depending on the year and May to September about 1,300 to 1,800, and each winter is higher than the one before.
+2. Weekdays are busier than weekends. The median falls from 2,257 on Monday to 1,888 on Friday, and weekend medians are about 40% lower than weekday ones.
+3. The biggest spikes are cold snaps, with HEAT/HOT WATER at 69 to 82% of requests against a January median of 58%. The models only see the calendar, so they can't see these coming, which is worth saying in the README.
+4. Six holidays (Independence Day, New Year's Day, Labor Day, Thanksgiving, Christmas and Memorial Day) run at 39 to 50% of a normal day, while the other federal holidays are close to normal. The models get a flag for those six instead of one holiday flag.
+5. Phone dropped twice, in early Dec 2025 and mid-Sep 2026, with online taking up the difference. The total doesn't show either break.
+
+Decisions for the models:
+
+- Forecast all channels. That answers the question from the initial exploration, since a phone-only series would have two level shifts in its last year.
+- 36 days are treated as missing: the 33 days with 2 hours or more of feed gaps, plus 16, 17 and 19 Mar 2024, which look like a slow feed and a backlog.
