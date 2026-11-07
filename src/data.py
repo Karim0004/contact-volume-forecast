@@ -5,6 +5,9 @@ import pandas as pd
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
+# 16 and 17 Mar 2024 look like a slow feed and 19 Mar 2024 like the backlog after it (see notes.md)
+SLOW_FEED_DAYS = ["2024-03-16", "2024-03-17", "2024-03-19"]
+
 
 def load_requests(path=DATA_DIR / "HPD_requests.parquet"):
     """Load the created time and channel of every request."""
@@ -50,3 +53,16 @@ def daily_counts(interval):
     us_holidays = holidays.US(years=range(daily.index.year.min(), daily.index.year.max() + 1))
     daily["holiday"] = [d in us_holidays for d in daily.index.date]
     return daily
+
+
+def model_series(daily):
+    """Daily total for the models, plus a mask of the days that are real.
+
+    Days with 2 hours or more of feed gaps and the slow feed days are filled with the average of the
+    same weekday a week before and a week after, so the models get a complete series.
+    """
+    usable = (daily["gap_hours"] < 2) & ~daily.index.isin(pd.to_datetime(SLOW_FEED_DAYS))
+    y = daily["total"].where(usable)
+    nearby = pd.concat([y.shift(7), y.shift(-7)], axis=1).mean(axis=1)
+    y = y.fillna(nearby).asfreq("D")
+    return y, usable
