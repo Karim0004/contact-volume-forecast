@@ -35,3 +35,16 @@ Decisions for the models:
 
 - Forecast all channels. That answers the question from the initial exploration, since a phone-only series would have two level shifts in its last year.
 - 36 days are treated as missing: the 33 days with 2 hours or more of feed gaps, plus 16, 17 and 19 Mar 2024, which look like a slow feed and a backlog.
+
+## Backtest harness, 7 Nov 2026
+
+- `model_series()` in src/data.py gives the models a complete daily series. The 36 missing days are filled with the average of the same weekday a week before and a week after, and a mask says which days are real.
+- `backtest(model, y, usable)` in src/backtest.py takes any function `model(history, horizon)` that returns 14 numbers. The origins are every other Monday from 4 Nov 2024 to 5 Oct 2026 (51 origins). At each one the model gets every day before it and forecasts the next 14, so each forecast is a two-week rota and the windows don't overlap.
+- `score()` gives MAPE and MASE over the real days only (700 of the 714 forecast days), so the filled days are never scored. MASE is the MAE of each origin divided by the in-sample error of the seasonal naive forecast (same weekday last week) on that origin's history, averaged over the origins. Below 1 means better than seasonal naive does one step ahead.
+- Checked on a toy series going up by 1 a day: the naive model should get an MAE of 7.5 and a MASE of 7.5 / 7 = 1.07, and the harness gives exactly that.
+
+| Model | MAPE | MASE | MAE |
+| --- | ---: | ---: | ---: |
+| Naive (last day) | 39.8% | 1.77 | 961 |
+
+The naive model forecasts two weeks of weekdays from a Sunday, so weekday errors are 38 to 49% and weekend errors 27 to 30%.
