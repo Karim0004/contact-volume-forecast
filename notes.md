@@ -48,3 +48,14 @@ Decisions for the models:
 | Naive (last day) | 39.8% | 1.77 | 961 |
 
 The naive model forecasts two weeks of weekdays from a Sunday, so weekday errors are 38 to 49% and weekend errors 27 to 30%.
+
+## Baselines, 9 Nov 2026
+
+The three baselines are in src/models.py and the results table is in the README.
+
+1. Seasonal naive is the best of the three, at 24.7% MAPE and a MASE of 1.15. The weekly shape is worth more than the latest level.
+2. The 7-day average beats seasonal naive on 7 of the 10 weekdays but is 56 to 67% off on weekends, because it spreads the week's average evenly over all seven days.
+3. Seasonal naive is 36.2% off from November to March and 16.4% for the rest of the year, probably because a cold snap in one week gets copied into the next. Winter is where the models have the most to gain.
+4. All three have a MASE above 1. That's expected, since the scale is seasonal naive one day ahead on the history and these forecasts go 14 days out.
+
+Seasonal naive is the row the models have to beat.
