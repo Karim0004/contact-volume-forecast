@@ -81,3 +81,11 @@ Residuals: the biggest misses are still cold snaps. SARIMA undershoots while a c
 1. On the backtest, the 80% intervals contain the actual on 82.0% of days and the 95% ones on 92.9%, so overall they're about right. They're too narrow in winter (71.3% for the 80% interval from November to March) and a bit too wide the rest of the year (89.9%).
 2. Refitted on every day up to 30 Oct 2026, the forecast for 31 Oct to 13 Nov is about 2,300 to 2,900 requests on weekdays and 1,600 to 2,000 at weekends. The forecast and both intervals are saved to data/forecast_daily.csv.
 3. That's below the last two weeks of October, especially at weekends. The model has a weekly pattern but no yearly one, so it's slow to pick up the start of the heating season, the same undershoot the backtest showed at the start of winter. The real November numbers will probably land in the upper half of the intervals. A temperature forecast or a heating-season term would be the fix.
+
+## Intraday profile, 10 Nov 2026
+
+`intraday_profile()` and `spread_forecast()` in src/data.py (notebooks/08_intraday.ipynb).
+
+1. The profile is each half-hour's average share of the day, by weekday, from the last 52 weeks (358 days without any feed gap). The first year's profile differs from it by only 0.1 percentage points per half-hour on average, so the shape held steady while the channel mix moved.
+2. On weekdays requests climb from 7am, run at about 7 to 8% of the day per hour from 9am to 1pm and fade through the afternoon and evening. Weekends are flatter, with a lower midday peak and more of the day after 8pm. The busiest half-hours are just over 4% of the day and 3am is about 0.3%.
+3. Spread over the 14-day forecast that gives 672 half-hours, saved to data/forecast_interval.csv. The busiest is 11:00 on Wednesday 11 Nov at about 122 requests.

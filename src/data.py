@@ -66,3 +66,20 @@ def model_series(daily):
     nearby = pd.concat([y.shift(7), y.shift(-7)], axis=1).mean(axis=1)
     y = y.fillna(nearby).asfreq("D")
     return y, usable
+
+
+def intraday_profile(interval, days):
+    """Each 30-minute slot's average share of the day's requests, by weekday (rows 0 = Monday to 6 = Sunday)."""
+    total = interval.loc[interval.index.normalize().isin(days), "total"]
+    share = total / total.groupby(total.index.normalize()).transform("sum")
+    return share.groupby([share.index.day_of_week, share.index.time]).mean().unstack()
+
+
+def spread_forecast(daily_forecast, profile):
+    """Split a daily forecast into 30-minute slots using the profile for each day's weekday."""
+    parts = []
+    for day, total in daily_forecast.items():
+        shares = profile.loc[day.day_of_week]
+        slots = [pd.Timestamp.combine(day.date(), t) for t in shares.index]
+        parts.append(pd.Series(total * shares.to_numpy(), index=slots))
+    return pd.concat(parts).rename_axis("interval")
