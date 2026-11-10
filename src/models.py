@@ -40,12 +40,26 @@ def ets(history, horizon):
     return np.exp(fit.forecast(horizon).to_numpy())
 
 
-def sarima(history, horizon):
-    """SARIMA(1,0,1)(0,1,1)7 on the log of the series, with the big holidays as a regressor."""
+def sarima_forecast(history, horizon, alpha=0.2):
+    """SARIMA(1,0,1)(0,1,1)7 on the log of the series, with the big holidays as a regressor.
+
+    Returns the forecast with a lower and upper bound (an 80% interval by default), back on the request scale.
+    """
     exog = big_holiday(history.index).reshape(-1, 1)
-    future = big_holiday(future_dates(history, horizon)).reshape(-1, 1)
+    dates = future_dates(history, horizon)
+    future = big_holiday(dates).reshape(-1, 1)
     fit = SARIMAX(np.log(history), exog=exog, order=(1, 0, 1), seasonal_order=(0, 1, 1, 7)).fit(disp=False)
-    return np.exp(fit.forecast(horizon, exog=future).to_numpy())
+    pred = fit.get_forecast(horizon, exog=future)
+    bounds = pred.conf_int(alpha=alpha).to_numpy()
+    return pd.DataFrame({
+        "forecast": np.exp(pred.predicted_mean.to_numpy()),
+        "lower": np.exp(bounds[:, 0]),
+        "upper": np.exp(bounds[:, 1]),
+    }, index=dates)
+
+
+def sarima(history, horizon):
+    return sarima_forecast(history, horizon)["forecast"].to_numpy()
 
 
 def lag_features(y):

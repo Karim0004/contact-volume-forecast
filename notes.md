@@ -73,3 +73,11 @@ All three models are in src/models.py and run on the log of daily requests, so t
 Chosen: SARIMA. Gradient boosting has a slightly lower MAPE, but SARIMA is better on MASE and MAE, which weigh the busy winter days more, and those are the days that decide how many agents are needed. It also gives prediction intervals directly, which the final forecast needs.
 
 Residuals: the biggest misses are still cold snaps. SARIMA undershoots while a cold snap is on (40 to 65% under in late Jan 2026) and overshoots the week after it ends (up to 136% over in mid-Feb 2026), just less than seasonal naive. From April to October 73% of days are within 20%. The residual autocorrelation is under 0.1 at every lag up to 28 days, so there's no weekly pattern left that the model misses.
+
+## Forecast, 10 Nov 2026
+
+`sarima_forecast()` in src/models.py gives the forecast with an interval (notebooks/07_forecast.ipynb).
+
+1. On the backtest, the 80% intervals contain the actual on 82.0% of days and the 95% ones on 92.9%, so overall they're about right. They're too narrow in winter (71.3% for the 80% interval from November to March) and a bit too wide the rest of the year (89.9%).
+2. Refitted on every day up to 30 Oct 2026, the forecast for 31 Oct to 13 Nov is about 2,300 to 2,900 requests on weekdays and 1,600 to 2,000 at weekends. The forecast and both intervals are saved to data/forecast_daily.csv.
+3. That's below the last two weeks of October, especially at weekends. The model has a weekly pattern but no yearly one, so it's slow to pick up the start of the heating season, the same undershoot the backtest showed at the start of winter. The real November numbers will probably land in the upper half of the intervals. A temperature forecast or a heating-season term would be the fix.
