@@ -59,3 +59,17 @@ The three baselines are in src/models.py and the results table is in the README.
 4. All three have a MASE above 1. That's expected, since the scale is seasonal naive one day ahead on the history and these forecasts go 14 days out.
 
 Seasonal naive is the row the models have to beat.
+
+## Models, 10 Nov 2026
+
+All three models are in src/models.py and run on the log of daily requests, so the weekly and yearly swings act as percentages. The full table is in the README and notebooks/06_models.ipynb.
+
+1. SARIMA(1,0,1)(0,1,1)7 with a big-holiday regressor gets 20.8% MAPE and a MASE of 0.96, which is 3.9 points better than seasonal naive. Most of that is winter: 27.5% from November to March against 36.2% for seasonal naive.
+2. Gradient boosting gets 20.4% MAPE and a MASE of 0.99. Its features only use days at least 14 back (lags of 14, 21 and 28 days, the mean of days 14 to 20 back, weekday, month and the big-holiday flag), so none of them is unknown for any of the 14 days ahead. The plan said lags of 1 and 7, but those aren't known for most of a 14-day forecast without forecasting step by step.
+3. Holt-Winters (ETS) doesn't beat seasonal naive (25.6% against 24.7%), with or without the trend.
+4. The holiday regressor is worth 1.3 points to SARIMA (22.1% without it). Its coefficient is -0.56 on the log scale, so the big holidays come out at about 57% of a normal day, close to what the EDA found.
+5. Gradient boosting with sklearn's default leaf size of 20 never split on the holiday flag, because the history only has 5 to 12 big holidays, so it was 100% off on them. A leaf size of 5 fixed that (36.5% off on holidays, MAPE 21.1% down to 20.4%).
+
+Chosen: SARIMA. Gradient boosting has a slightly lower MAPE, but SARIMA is better on MASE and MAE, which weigh the busy winter days more, and those are the days that decide how many agents are needed. It also gives prediction intervals directly, which the final forecast needs.
+
+Residuals: the biggest misses are still cold snaps. SARIMA undershoots while a cold snap is on (40 to 65% under in late Jan 2026) and overshoots the week after it ends (up to 136% over in mid-Feb 2026), just less than seasonal naive. From April to October 73% of days are within 20%. The residual autocorrelation is under 0.1 at every lag up to 28 days, so there's no weekly pattern left that the model misses.
