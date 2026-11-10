@@ -102,3 +102,7 @@ Assumptions: an average handle time of 5 minutes, 80% of calls answered within 2
 4. The handle time matters more than anything in the forecast. A 4-minute handle time needs 1,251 agent-hours on the phones over the two weeks, 5 minutes needs 1,451 and 6 minutes 1,634, so about 190 hours for every extra minute.
 
 The weekday by half-hour table is saved to data/staffing_by_slot.csv for the dashboard.
+
+## README and summary, 10 Nov 2026
+
+The README now follows PACE, with the data source and download date, what each notebook covers, results, the choice, what didn't work, limitations and how to run. The one-page executive summary is in reports/. `build_parquet()` in src/data.py turns the NYC Open Data CSV export into the parquet file the rest of the code reads, and gives the same counts as before.

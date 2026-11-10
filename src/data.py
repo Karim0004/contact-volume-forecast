@@ -9,6 +9,13 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 SLOW_FEED_DAYS = ["2024-03-16", "2024-03-17", "2024-03-19"]
 
 
+def build_parquet(csv_path, out_path=DATA_DIR / "HPD_requests.parquet"):
+    """Turn the NYC Open Data CSV export into the parquet file that load_requests() reads."""
+    df = pd.read_csv(csv_path, parse_dates=["created_date"])
+    df = df[df["agency"] == "HPD"]
+    df.to_parquet(out_path, index=False)
+
+
 def load_requests(path=DATA_DIR / "HPD_requests.parquet"):
     """Load the created time and channel of every request."""
     df = pd.read_parquet(path, columns=["created_date", "open_data_channel_type"])
