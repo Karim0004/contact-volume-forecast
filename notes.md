@@ -89,3 +89,16 @@ Residuals: the biggest misses are still cold snaps. SARIMA undershoots while a c
 1. The profile is each half-hour's average share of the day, by weekday, from the last 52 weeks (358 days without any feed gap). The first year's profile differs from it by only 0.1 percentage points per half-hour on average, so the shape held steady while the channel mix moved.
 2. On weekdays requests climb from 7am, run at about 7 to 8% of the day per hour from 9am to 1pm and fade through the afternoon and evening. Weekends are flatter, with a lower midday peak and more of the day after 8pm. The busiest half-hours are just over 4% of the day and 3am is about 0.3%.
 3. Spread over the 14-day forecast that gives 672 half-hours, saved to data/forecast_interval.csv. The busiest is 11:00 on Wednesday 11 Nov at about 122 requests.
+
+## Erlang C staffing, 10 Nov 2026
+
+src/erlang.py has `erlang_c()`, `service_level()`, `agents_needed()` and `with_shrinkage()` (notebooks/09_staffing.ipynb).
+
+Assumptions: an average handle time of 5 minutes, 80% of calls answered within 20 seconds, and 30% shrinkage for breaks, training, meetings and absence.
+
+1. Checked against the textbook case: 10 Erlangs on 11 agents gives a 0.682 chance of waiting, which `erlang_c()` matches.
+2. Erlang C models a phone queue, so it runs on calls only: the forecast per half-hour times phone's share of that half-hour over the last 6 weeks (40 days, all after phone's mid-September drop). Phone is 25.1% overall, higher at night. That's where forecasting all channels pays off, since the channel shifts only have to be handled in this one share.
+3. That gives about 8,435 calls over the 14 days and at most 34 in a half-hour. Weekdays from about 9:30 to 3:30 need 12 agents scheduled in most half-hours, with a peak of 13 (9 on the phones) at 11:00 on Wednesday 11 Nov. Nights never drop below 3, because one agent alone can't answer 80% within 20 seconds once there's more than a trickle of calls.
+4. The handle time matters more than anything in the forecast. A 4-minute handle time needs 1,251 agent-hours on the phones over the two weeks, 5 minutes needs 1,451 and 6 minutes 1,634, so about 190 hours for every extra minute.
+
+The weekday by half-hour table is saved to data/staffing_by_slot.csv for the dashboard.
