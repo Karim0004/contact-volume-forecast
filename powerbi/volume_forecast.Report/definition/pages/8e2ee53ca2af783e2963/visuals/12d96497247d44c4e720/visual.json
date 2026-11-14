@@ -1,0 +1,100 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "12d96497247d44c4e720",
+  "position": {
+    "x": 40,
+    "y": 295,
+    "z": 3000,
+    "height": 370,
+    "width": 1400,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "forecast_daily"
+                    }
+                  },
+                  "Property": "date"
+                }
+              },
+              "queryRef": "forecast_daily.date",
+              "nativeQueryRef": "date",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "forecast_daily"
+                    }
+                  },
+                  "Property": "Forecast requests"
+                }
+              },
+              "queryRef": "forecast_daily.Forecast requests",
+              "nativeQueryRef": "Forecast requests"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "forecast_daily"
+                    }
+                  },
+                  "Property": "Lower 80%"
+                }
+              },
+              "queryRef": "forecast_daily.Lower 80%",
+              "nativeQueryRef": "Lower 80%"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "forecast_daily"
+                    }
+                  },
+                  "Property": "Upper 80%"
+                }
+              },
+              "queryRef": "forecast_daily.Upper 80%",
+              "nativeQueryRef": "Upper 80%"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "lineStyles": [
+        {
+          "properties": {
+            "lineChartType": {
+              "expr": {
+                "Literal": {
+                  "Value": "'linear'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

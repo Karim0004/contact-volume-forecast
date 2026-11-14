@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "volume_forecast"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "c732dbf0-a3f3-421f-9481-e0c519a31703"
+  }
+}

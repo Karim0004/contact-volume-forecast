@@ -1,0 +1,99 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "e20c742b7b932bf9cdc1",
+  "position": {
+    "x": 40,
+    "y": 130,
+    "z": 1000,
+    "height": 150,
+    "width": 820,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "forecast_daily"
+                    }
+                  },
+                  "Property": "Forecast requests"
+                }
+              },
+              "queryRef": "forecast_daily.Forecast requests",
+              "nativeQueryRef": "Forecast requests"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "backtest_results"
+                    }
+                  },
+                  "Property": "SARIMA MAPE"
+                }
+              },
+              "queryRef": "backtest_results.SARIMA MAPE",
+              "nativeQueryRef": "SARIMA MAPE"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "backtest_results"
+                    }
+                  },
+                  "Property": "Seasonal naive MAPE"
+                }
+              },
+              "queryRef": "backtest_results.Seasonal naive MAPE",
+              "nativeQueryRef": "Seasonal naive MAPE"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "staffing_by_slot"
+                    }
+                  },
+                  "Property": "Agents needed"
+                }
+              },
+              "queryRef": "staffing_by_slot.Agents needed",
+              "nativeQueryRef": "Peak agents",
+              "displayName": "Peak agents"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "value": [
+        {
+          "properties": {
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "forecast_daily.Forecast requests"
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

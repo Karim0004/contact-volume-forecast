@@ -1,0 +1,66 @@
+table forecast_daily
+	lineageTag: c8ca3e1a-6d59-4574-afe0-15d5d7faf4ad
+
+	measure 'Forecast requests' = SUM(forecast_daily[forecast])
+		formatString: #,0
+		lineageTag: 03dee8b4-0846-4002-86ef-5852db70d26c
+
+	measure 'Lower 80%' = SUM(forecast_daily[lower])
+		formatString: #,0
+		lineageTag: 52a8b000-0377-42fa-b0a8-5f1dd069f4db
+
+	measure 'Upper 80%' = SUM(forecast_daily[upper])
+		formatString: #,0
+		lineageTag: 7e4c81a2-130f-40c4-b358-672452eb8f06
+
+	column date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: fb6b8ade-cf10-43bf-b82d-d56e67d9ea1c
+		summarizeBy: none
+		sourceColumn: date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column forecast
+		dataType: double
+		lineageTag: cdee7e56-67c8-44fb-8558-19f9e1166238
+		summarizeBy: sum
+		sourceColumn: forecast
+
+	column lower
+		dataType: double
+		lineageTag: fef779b3-bb53-4cac-91d9-ee880445f282
+		summarizeBy: sum
+		sourceColumn: lower
+
+	column upper
+		dataType: double
+		lineageTag: c91d4ca1-d70f-4ee5-bdf2-2dd575147471
+		summarizeBy: sum
+		sourceColumn: upper
+
+	column lower_95
+		dataType: double
+		lineageTag: 8b779a3b-cf79-4c1e-8a5f-2018525a6e73
+		summarizeBy: sum
+		sourceColumn: lower_95
+
+	column upper_95
+		dataType: double
+		lineageTag: c4e039bb-f5e6-4f49-ba8f-a619465469c4
+		summarizeBy: sum
+		sourceColumn: upper_95
+
+	partition forecast_daily = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(File.Contents("P:\Data Science Projects\Contact-Center Volume Forecasting\data\forecast_daily.csv"),[Delimiter=",", Columns=6, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+					#"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					#"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"date", type date}, {"forecast", type number}, {"lower", type number}, {"upper", type number}, {"lower_95", type number}, {"upper_95", type number}})
+				in
+					#"Changed Type"
+
+	annotation PBI_ResultType = Table
+

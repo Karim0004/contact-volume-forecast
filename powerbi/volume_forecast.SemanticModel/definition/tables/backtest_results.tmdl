@@ -1,0 +1,99 @@
+table backtest_results
+	lineageTag: 2831f374-5b58-401d-8339-d7a6f23e72b9
+
+	measure MAPE = AVERAGEX(FILTER(backtest_results, backtest_results[usable] = TRUE()), DIVIDE(ABS(backtest_results[actual] - backtest_results[forecast]), backtest_results[actual]))
+		formatString: 0.0%
+		lineageTag: ae5b7a6f-90f2-4ab3-b9a4-4c55155b41ee
+
+	measure MASE = AVERAGEX(FILTER(backtest_results, backtest_results[usable] = TRUE()), DIVIDE(ABS(backtest_results[actual] - backtest_results[forecast]), backtest_results[scale]))
+		formatString: 0.00
+		lineageTag: 3ab08cfc-930c-4fc4-a8f5-fdb1671b9ff6
+
+	measure 'SARIMA MAPE' = CALCULATE([MAPE], backtest_results[model] = "SARIMA")
+		formatString: 0.0%
+		lineageTag: ee1408ca-986c-4b0e-995b-b3d5a50c1183
+
+	measure 'Seasonal naive MAPE' = CALCULATE([MAPE], backtest_results[model] = "seasonal naive")
+		formatString: 0.0%
+		lineageTag: 95889f15-b7ec-4aac-a876-c1dcef45164f
+
+	measure 'Backtest forecasts' = DISTINCTCOUNT(backtest_results[origin])
+		formatString: 0
+		lineageTag: 0ab2729c-6858-4f09-afd1-53a959bb1f47
+
+	measure 'Actual requests' = CALCULATE(SUM(backtest_results[actual]), backtest_results[model] = "SARIMA")
+		formatString: #,0
+		lineageTag: cb36b636-9fac-488c-b4e9-e46654ecb3ee
+
+	measure 'SARIMA forecast' = CALCULATE(SUM(backtest_results[forecast]), backtest_results[model] = "SARIMA")
+		formatString: #,0
+		lineageTag: 5b81dc19-e657-45ef-a7f6-4dcdbbbe1412
+
+	column model
+		dataType: string
+		lineageTag: 79e7b061-a287-4314-9fa6-dd950402530f
+		summarizeBy: none
+		sourceColumn: model
+
+	column origin
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 1c420c7b-1f7a-4e87-a012-f53815d22c9f
+		summarizeBy: none
+		sourceColumn: origin
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: f915dd24-3ef2-4542-9a8e-29d888008215
+		summarizeBy: none
+		sourceColumn: date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column step
+		dataType: int64
+		formatString: 0
+		lineageTag: 4b4bf694-d2d4-42ee-8504-ccf803d9b5d7
+		summarizeBy: none
+		sourceColumn: step
+
+	column actual
+		dataType: double
+		lineageTag: 1da3cc28-297a-4d28-bf7c-16e54902170c
+		summarizeBy: sum
+		sourceColumn: actual
+
+	column forecast
+		dataType: double
+		lineageTag: c7ac1b68-4a9e-4c06-8aa4-b72eb816709d
+		summarizeBy: sum
+		sourceColumn: forecast
+
+	column scale
+		dataType: double
+		lineageTag: 901efa50-c340-45cd-b00a-4b0b8173968c
+		summarizeBy: sum
+		sourceColumn: scale
+
+	column usable
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 68eca987-0476-49b7-bfff-d46e24ed4214
+		summarizeBy: none
+		sourceColumn: usable
+
+	partition backtest_results = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(File.Contents("P:\Data Science Projects\Contact-Center Volume Forecasting\data\backtest_results.csv"),[Delimiter=",", Columns=8, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+					#"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					#"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"model", type text}, {"origin", type date}, {"date", type date}, {"step", Int64.Type}, {"actual", type number}, {"forecast", type number}, {"scale", type number}, {"usable", type logical}})
+				in
+					#"Changed Type"
+
+	annotation PBI_ResultType = Table
+

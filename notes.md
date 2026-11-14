@@ -106,3 +106,13 @@ The weekday by half-hour table is saved to data/staffing_by_slot.csv for the das
 ## README and summary, 10 Nov 2026
 
 The README now follows PACE, with the data source and download date, what each notebook covers, results, the choice, what didn't work, limitations and how to run. The one-page executive summary is in reports/. `build_parquet()` in src/data.py turns the NYC Open Data CSV export into the parquet file the rest of the code reads, and gives the same counts as before.
+
+## Power BI page, 14 Nov 2026
+
+powerbi/volume_forecast.pbip is a one-page report on the three files saved for it: data/forecast_daily.csv, data/backtest_results.csv and data/staffing_by_slot.csv. It's saved as a Power BI project, so the model and the report are text files in the repo. The three tables aren't related, and each visual uses one of them.
+
+1. The cards show 33,544 forecast requests over the 14 days, the backtest MAPE for SARIMA (20.8%) and seasonal naive (24.7%), and the peak of 13 agents. The MAPE and MASE measures only count the usable days, so they match the results table.
+2. The staffing file has a row per weekday and 48 half-hour columns. The query unpivots it to a row per weekday and slot, and an index column keeps the weekdays in order from Monday.
+3. The backtest chart shows each forecast's 14-day total against the actual. Plotted by day it was 714 points per line and the two lines covered each other. The totals show the model reacting late to the biggest peak: the forecast from 26 Jan 2026 was 59,737 against 81,996 actual, and the next one, from 9 Feb, was 72,267 against 46,952.
+4. SARIMA's error grows with the days ahead, from 10.6% on day 1 to between 18.6% and 25.2% from day 4 to day 12, then 32.8% and 33.6% on the last two days. It beats seasonal naive on 10 of the 14 days.
+5. The theme draws smoothed lines by default, which bend between the points. The three line charts are set to straight lines.

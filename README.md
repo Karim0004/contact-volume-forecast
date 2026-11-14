@@ -63,6 +63,12 @@ On the backtest the 80% intervals contain the actual on 82.0% of days, but only 
 
 Each day is split into half-hours with the average weekday profile from the last 52 weeks, which barely changed between the two years. Erlang C models a phone queue, so it runs on calls only: the forecast times phone's share of each half-hour over the last 6 weeks (25.1% overall). With a 5-minute handle time, 80% of calls answered within 20 seconds and 30% shrinkage, weekdays from about 9:30 to 3:30 need 12 agents scheduled in most half-hours, with a peak of 13 at 11:00 on Wednesday 11 Nov. A 4-minute or 6-minute handle time moves the two-week total by about 190 agent-hours each way.
 
+### Power BI page
+
+![Forecast and staffing page in Power BI](powerbi/volume_forecast.png)
+
+[volume_forecast.pbip](powerbi/volume_forecast.pbip) is a one-page Power BI report on the files the notebooks save for it: the 14-day forecast with its 80% interval, the backtest results and the staffing table. The bottom-left chart shows each backtest forecast's 14-day total against the actual, and the one next to it shows SARIMA's error growing from 10.6% one day ahead to 33.6% at day 14.
+
 ### What didn't work
 
 Holt-Winters never beat seasonal naive, with or without a trend. Gradient boosting with sklearn's default leaf size never learned the holiday flag, because the history only has 5 to 12 big holidays, and was 100% off on them until the leaf size came down to 5.
@@ -83,3 +89,4 @@ The model has a weekly pattern but no yearly one, so it's slow to pick up the st
    ```
 
 4. Run the notebooks in `notebooks/` in order, from 01 to 09. Notebook 02 saves the daily and interval tables the later ones use, and figures go to `reports/figures/`.
+5. For the Power BI page, open `powerbi/volume_forecast.pbip` in Power BI Desktop once notebooks 06, 07 and 09 have saved their CSV files to `data/`. The queries read the files by full path, so change the path in each query's Source step to your own folder and refresh.

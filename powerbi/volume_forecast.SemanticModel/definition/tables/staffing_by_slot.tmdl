@@ -1,0 +1,51 @@
+table staffing_by_slot
+	lineageTag: 187e3625-b1ce-4cfc-b590-aa1deaa6a45f
+
+	measure 'Agents needed' = MAX(staffing_by_slot[agents])
+		formatString: 0
+		lineageTag: 74d081c9-21b2-4390-b397-86f443480f31
+
+	column weekday
+		dataType: string
+		lineageTag: 8438e0e8-5541-49bc-8b9a-9e2cec5418f9
+		summarizeBy: none
+		sourceColumn: weekday
+		sortByColumn: weekday_no
+
+	column weekday_no
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: db3a7998-c4a7-4ef3-995e-dbd6d7d4fb6b
+		summarizeBy: none
+		sourceColumn: weekday_no
+
+	column slot
+		dataType: string
+		lineageTag: 5b54de3e-3b52-4e6a-9dfb-ab71b91f51fa
+		summarizeBy: none
+		sourceColumn: slot
+
+	column agents
+		dataType: int64
+		formatString: 0
+		lineageTag: 3e8b4381-5ffd-4e3c-89e2-9d6852a6bfee
+		summarizeBy: sum
+		sourceColumn: agents
+
+	partition staffing_by_slot = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(File.Contents("P:\Data Science Projects\Contact-Center Volume Forecasting\data\staffing_by_slot.csv"),[Delimiter=",", Columns=49, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+					#"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					#"Renamed Columns" = Table.RenameColumns(#"Promoted Headers",{{Table.ColumnNames(#"Promoted Headers"){0}, "weekday"}}),
+					#"Added Index" = Table.AddIndexColumn(#"Renamed Columns", "weekday_no", 1, 1, Int64.Type),
+					#"Unpivoted Other Columns" = Table.UnpivotOtherColumns(#"Added Index", {"weekday", "weekday_no"}, "slot", "agents"),
+					#"Extracted First Characters" = Table.TransformColumns(#"Unpivoted Other Columns", {{"slot", each Text.Start(_, 5), type text}}),
+					#"Changed Type" = Table.TransformColumnTypes(#"Extracted First Characters",{{"weekday", type text}, {"agents", Int64.Type}})
+				in
+					#"Changed Type"
+
+	annotation PBI_ResultType = Table
+

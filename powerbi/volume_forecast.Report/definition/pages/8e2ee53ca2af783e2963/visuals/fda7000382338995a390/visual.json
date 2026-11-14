@@ -1,0 +1,92 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "fda7000382338995a390",
+  "position": {
+    "x": 880,
+    "y": 680,
+    "z": 5000,
+    "height": 380,
+    "width": 560,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "backtest_results"
+                    }
+                  },
+                  "Property": "step"
+                }
+              },
+              "queryRef": "backtest_results.step",
+              "nativeQueryRef": "Days ahead",
+              "active": true,
+              "displayName": "Days ahead"
+            }
+          ]
+        },
+        "Series": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "backtest_results"
+                    }
+                  },
+                  "Property": "model"
+                }
+              },
+              "queryRef": "backtest_results.model",
+              "nativeQueryRef": "model",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "backtest_results"
+                    }
+                  },
+                  "Property": "MAPE"
+                }
+              },
+              "queryRef": "backtest_results.MAPE",
+              "nativeQueryRef": "MAPE"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "lineStyles": [
+        {
+          "properties": {
+            "lineChartType": {
+              "expr": {
+                "Literal": {
+                  "Value": "'linear'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
